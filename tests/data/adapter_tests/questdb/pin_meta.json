@@ -1,0 +1,90 @@
+{
+  "pin": "questdb/questdb:8.2.2",
+  "build": "Build Information: QuestDB 8.2.2, JDK 17.0.11, Commit Hash 73d82aa6ae15d9f08ce3e4221a78415233958586",
+  "tables_rows": [
+    {
+      "table_name": "plain_table",
+      "matView": false,
+      "partitionBy": "NONE",
+      "designatedTimestamp": null
+    },
+    {
+      "table_name": "readings",
+      "matView": false,
+      "partitionBy": "DAY",
+      "designatedTimestamp": "ts"
+    },
+    {
+      "table_name": "readings_mv",
+      "matView": true,
+      "partitionBy": "MONTH",
+      "designatedTimestamp": "ts"
+    },
+    {
+      "table_name": "tricky'name",
+      "matView": false,
+      "partitionBy": "NONE",
+      "designatedTimestamp": "created"
+    }
+  ],
+  "table_columns": {
+    "plain_table": [
+      {
+        "column": "id",
+        "type": "INT",
+        "designated": false
+      },
+      {
+        "column": "name",
+        "type": "STRING",
+        "designated": false
+      }
+    ],
+    "readings": [
+      {
+        "column": "sensor",
+        "type": "SYMBOL",
+        "designated": false
+      },
+      {
+        "column": "ts",
+        "type": "TIMESTAMP",
+        "designated": true
+      },
+      {
+        "column": "value",
+        "type": "DOUBLE",
+        "designated": false
+      }
+    ],
+    "readings_mv": [
+      {
+        "column": "ts",
+        "type": "TIMESTAMP",
+        "designated": true
+      },
+      {
+        "column": "sensor",
+        "type": "SYMBOL",
+        "designated": false
+      },
+      {
+        "column": "cnt",
+        "type": "LONG",
+        "designated": false
+      }
+    ],
+    "tricky'name": [
+      {
+        "column": "id",
+        "type": "INT",
+        "designated": false
+      },
+      {
+        "column": "created",
+        "type": "TIMESTAMP",
+        "designated": true
+      }
+    ]
+  }
+}

@@ -15,7 +15,7 @@ from textual_textarea import PathInput
 from harlequin.components.error_modal import ErrorModal
 from harlequin.components.results_viewer import ResultsTable
 from harlequin.exception import HarlequinCopyError
-from harlequin.export import copy
+from harlequin.export import copy, default_export_filename, next_default_export_path
 from harlequin.options import AbstractOption, HarlequinCopyFormat
 
 ExportOptions = Dict[str, Any]
@@ -132,7 +132,7 @@ class ExportScreen(ModalScreen[Tuple[Path, str, ExportOptions]]):
                 yield Button(label="Cancel", variant="error", id="cancel")
                 yield Button(label="Export", variant="primary", id="export")
 
-    def on_mount(self) -> None:
+    async def on_mount(self) -> None:
         container = self.query_one("#export_outer")
         container.border_title = "Data Exporter"
         self.format_select = self.query_one(Select)
@@ -142,6 +142,12 @@ class ExportScreen(ModalScreen[Tuple[Path, str, ExportOptions]]):
             "#options_container", NoFocusVerticalScroll
         )
         self.export_button = self.query_one("#export", Button)
+        first = self.formats[0]
+        self.file_input.value = str(
+            Path.cwd() / default_export_filename(first.filename_suffix)
+        )
+        self.format_select.value = first.name
+        await self._mount_copy_options(first.name)
         self.file_input.focus()
 
     def on_key(self, event: events.Key) -> None:
@@ -183,18 +189,27 @@ class ExportScreen(ModalScreen[Tuple[Path, str, ExportOptions]]):
 
     async def on_select_changed(self, event: Select.Changed) -> None:
         event.stop()
-        if event.control.id == "format_select":
-            for child in self.options_container.children:
-                await child.remove()
-            try:
-                assert self.formats is not None
-                [options] = [
-                    fmt.options for fmt in self.formats if fmt.name == event.value
-                ]
-            except (ValueError, IndexError, AssertionError):
-                return
-            menu = CopyOptionsMenu(str(event.value), options)
-            await self.options_container.mount(menu)
+        if event.control.id != "format_select":
+            return
+        fmt_name = str(event.value)
+        await self._mount_copy_options(fmt_name)
+        fmt = next(f for f in self.formats if f.name == fmt_name)
+        self.file_input.value = next_default_export_path(
+            self.file_input.value, fmt.filename_suffix
+        )
+
+    async def _mount_copy_options(self, format_name: str) -> None:
+        assert self.formats is not None
+        for child in list(self.options_container.children):
+            await child.remove()
+        try:
+            [options] = [
+                fmt.options for fmt in self.formats if fmt.name == format_name
+            ]
+        except (ValueError, IndexError):
+            return
+        menu = CopyOptionsMenu(format_name, options)
+        await self.options_container.mount(menu)
 
     def _export(self) -> None:
         path = Path(self.file_input.value)

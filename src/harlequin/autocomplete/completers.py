@@ -102,7 +102,14 @@ class WordCompleter:
     def _merge_completions(
         *completion_lists: list[HarlequinCompletion],
     ) -> list[HarlequinCompletion]:
-        return [c for c in sorted(itertools.chain(*completion_lists))]
+        seen: set[tuple[str, str, str | None, str]] = set()
+        merged: list[HarlequinCompletion] = []
+        for c in sorted(itertools.chain(*completion_lists)):
+            key = (c.label, c.type_label, c.context_val, c.value)
+            if key not in seen:
+                seen.add(key)
+                merged.append(c)
+        return merged
 
     @staticmethod
     def _dedupe_labels(
@@ -144,7 +151,7 @@ class MemberCompleter(WordCompleter):
         )
 
         context_completions = [
-            c for c in self.completions if c.context == match_context
+            c for c in self.completions if c.context_val == match_context
         ]
 
         matches: list[tuple[tuple[str, str], str]] = []
@@ -187,11 +194,15 @@ class MemberCompleter(WordCompleter):
     def _merge_completions(
         *completion_lists: list[HarlequinCompletion],
     ) -> list[HarlequinCompletion]:
-        return [
-            c
-            for c in sorted(itertools.chain(*completion_lists))
-            if c.context is not None
-        ]
+        seen: set[tuple[str, str, str | None, str]] = set()
+        merged: list[HarlequinCompletion] = []
+        for c in sorted(itertools.chain(*completion_lists)):
+            if c.context is not None:
+                key = (c.label, c.type_label, c.context_val, c.value)
+                if key not in seen:
+                    seen.add(key)
+                    merged.append(c)
+        return merged
 
 
 def completer_factory(

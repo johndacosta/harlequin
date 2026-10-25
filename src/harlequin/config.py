@@ -269,12 +269,13 @@ def _raise_on_bad_schema(config: Config) -> None:
             "must be a string.",
             title="Harlequin couldn't load your config file.",
         )
-    elif (
+    profiles = config.get("profiles", None)
+    if (
         default is not None
         and isinstance(default, str)
-        and isinstance(config["profiles"], dict)
+        and isinstance(profiles, dict)
         and default != "None"
-        and config["profiles"].get(default, None) is None
+        and profiles.get(default, None) is None
     ):
         raise HarlequinConfigError(
             f"Config files set the default_profile to {default}, but do not define a "

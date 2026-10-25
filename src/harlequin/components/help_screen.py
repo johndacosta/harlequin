@@ -20,7 +20,7 @@ class HelpScreen(ModalScreen):
 
     def compose(self) -> ComposeResult:
         markdown_path = Path(__file__).parent / "help_screen.md"
-        with open(markdown_path, "r") as f:
+        with open(markdown_path, "r", encoding="utf-8") as f:
             markdown = f.read()
 
         with VerticalSuppressClicks(id="modal_outer"):

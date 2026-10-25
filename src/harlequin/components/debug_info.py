@@ -279,9 +279,10 @@ class DebugInfoScreen(ModalScreen):
     def move_focus(self, direction: int) -> None:
         focusables = [
             self.query_one("#collapsible-harlequin-details"),
+            self.query_one("#collapsible-active-profile-config"),
             self.query_one("#collapsible-full-config"),
             self.query_one("#collapsible-adapter-details"),
-            self.query_one("#collapsible-client-adapter-details"),
+            self.query_one("#collapsible-adapter-details-section"),
             self.query_one("#collapsible-adapter-options"),
         ]
         current = self.focused
@@ -297,11 +298,11 @@ class DebugInfoScreen(ModalScreen):
             self.app.pop_screen()
             event.stop()
         elif event.key == "pageup":
-            container = self.query_one("#modal_outer")
+            container = self.query_one("#debug_info_scroll")
             container.scroll_page_up()
             event.stop()
         elif event.key == "pagedown":
-            container = self.query_one("#modal_outer")
+            container = self.query_one("#debug_info_scroll")
             container.scroll_page_down()
             event.stop()
 

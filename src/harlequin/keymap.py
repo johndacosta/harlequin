@@ -34,15 +34,10 @@ class HarlequinKeyBinding:
         """
         Returns a dictionary that can be written to a TOML config file.
         """
-
-        class Missing:
-            def __bool__(self) -> bool:
-                return True
-
-        all_keys: RawKeyBinding = self.__dict__  # type: ignore[assignment]
-        if not all_keys.get("key_display", Missing):
-            all_keys.pop("key_display")
-        return all_keys
+        d: RawKeyBinding = {"keys": self.keys, "action": self.action}
+        if self.key_display is not None:
+            d["key_display"] = self.key_display
+        return d
 
 
 @dataclass
@@ -52,6 +47,8 @@ class HarlequinKeyMap:
 
     @classmethod
     def from_config(cls, name: str, bindings: list[RawKeyBinding]) -> "HarlequinKeyMap":
+        from harlequin.actions import HARLEQUIN_ACTIONS
+
         try:
             keymap = cls(
                 name=name,
@@ -63,11 +60,20 @@ class HarlequinKeyMap:
                 title="Harlequin could not load your keymap.",
                 msg=(
                     "Key bindings must be defined in config files with "
-                    "only three properties: `keys`, `action`, and `key_profile`. "
+                    "only three properties: `keys`, `action`, and `key_display`. "
                     f"Got a binding in the map named {name} that tried to define "
                     f"a property: {bad_key!r}"
                 ),
             ) from e
+        for b in keymap.bindings:
+            if b.action not in HARLEQUIN_ACTIONS:
+                raise HarlequinConfigError(
+                    title="Harlequin could not load your keymap.",
+                    msg=(
+                        f"Key binding in keymap {name} specifies unknown action "
+                        f"{b.action!r}."
+                    ),
+                )
         return keymap
 
     def to_dict(self) -> RawKeyMap:

@@ -34,18 +34,30 @@ class HarlequinCompletion:
     priority: int
     context: str | None = None
 
-    def __lt__(self, other: "HarlequinCompletion") -> bool:
-        return (self.priority, self.label) < (other.priority, other.label)
+    def __lt__(self, other: HarlequinCompletion) -> bool:
+        if self.priority != other.priority:
+            return self.priority < other.priority
+        return self.label < other.label
 
-    def __le__(self, other: "HarlequinCompletion") -> bool:
-        return (self.priority, self.label) <= (other.priority, other.label)
+    def __le__(self, other: HarlequinCompletion) -> bool:
+        if self.priority != other.priority:
+            return self.priority < other.priority
+        return self.label <= other.label
 
-    def __gt__(self, other: "HarlequinCompletion") -> bool:
-        return (self.priority, self.label) > (other.priority, other.label)
+    def __gt__(self, other: HarlequinCompletion) -> bool:
+        if self.priority != other.priority:
+            return self.priority > other.priority
+        return self.label > other.label
 
-    def __ge__(self, other: "HarlequinCompletion") -> bool:
-        return (self.priority, self.label) >= (other.priority, other.label)
+    def __ge__(self, other: HarlequinCompletion) -> bool:
+        if self.priority != other.priority:
+            return self.priority > other.priority
+        return self.label >= other.label
 
     @cached_property
     def match_val(self) -> str:
         return self.label.lower()
+
+    @cached_property
+    def context_val(self) -> str | None:
+        return self.context.lower() if self.context is not None else None

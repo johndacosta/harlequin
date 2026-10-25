@@ -1,3 +1,4 @@
+import datetime as dt
 import sys
 from pathlib import Path
 from typing import Awaitable, Callable, List
@@ -6,6 +7,18 @@ import pytest
 
 from harlequin import Harlequin
 from harlequin.components import ExportScreen
+
+
+@pytest.fixture(autouse=True)
+def freeze_export_default_timestamp(monkeypatch: pytest.MonkeyPatch) -> None:
+    fixed = dt.datetime(2024, 1, 15, 12, 30, 45, 123000)
+
+    class _FrozenDateTime:
+        @staticmethod
+        def now(tz=None):
+            return fixed
+
+    monkeypatch.setattr("harlequin.export.datetime", _FrozenDateTime)
 
 
 @pytest.mark.asyncio

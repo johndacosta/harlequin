@@ -47,6 +47,15 @@ def concatenate(first: str, second: str) -> str:
     return f"{first}\n----or----\n{second}"
 
 
+def _validate_name(name: str) -> None:
+    if not re.fullmatch(r"[A-Za-z](\w|-)*", name):
+        raise ValueError(
+            "An Option's name attribute must match "
+            r"""r'[A-Za-z](\w|-)*' """
+            "so it is a valid CLI flag and HTML/CSS id."
+        )
+
+
 class AbstractOption(ABC):
     """
     The ABC for Harlequin options that are used as both command-line options and
@@ -76,14 +85,8 @@ class AbstractOption(ABC):
                 (including the `-` prefix) for this option (e.g., ["-p"]).
         """
         # names should be valid html/css ids
-        if re.match(r"[A-Za-z](\w|-)*", name):
-            self.name = name
-        else:
-            raise ValueError(
-                "An Option's name attribute must match "
-                r"""r'[A-Za-z](\w|-)*' """
-                "so it is a valid CLI flag and HTML/CSS id."
-            )
+        _validate_name(name)
+        self.name = name
         self.description = description
         self.label = label or name.replace("_", " ").replace("_", " ").capitalize()
         short_decls = short_decls or []
@@ -102,6 +105,9 @@ class AbstractOption(ABC):
     @abstractmethod
     def to_click(self) -> Callable[[click.Command], click.Command]:
         pass
+
+    def to_click_option(self) -> Callable[[click.Command], click.Command]:
+        return self.to_click()
 
     @abstractmethod
     def to_widgets(self) -> Generator[Widget, None, None]:
@@ -541,13 +547,10 @@ class SelectOption(AbstractOption):
         )
 
     def _flat_choices(self) -> list[str]:
-        choices: list[str] = []
-        for choice in self.choices:
-            if isinstance(choice, str):
-                choices.append(choice)
-            else:
-                choices.append(choice[0])
-        return choices
+        return [
+            choice if isinstance(choice, str) else choice[1]
+            for choice in self.choices
+        ]
 
 
 class FlagOption(AbstractOption):
@@ -617,6 +620,7 @@ class HarlequinCopyFormat:
     label: str
     extensions: Sequence[str]
     options: Sequence[HarlequinAdapterOption]
+    filename_suffix: str
 
     def __init__(
         self,
@@ -624,6 +628,7 @@ class HarlequinCopyFormat:
         label: str | None = None,
         extensions: Sequence[str] | None = None,
         options: Sequence[HarlequinAdapterOption] | None = None,
+        filename_suffix: str | None = None,
     ) -> None:
         """
         Args:
@@ -635,6 +640,8 @@ class HarlequinCopyFormat:
             options (Sequence[HarlequinAdapterOption] | None): A list of options for
                 configuring copy operations for this format. e.g.,
                 [FlagOption(name="Header", description="Include header row?")]
+            filename_suffix (str | None): Trailing segment for default export filenames
+                (``... .out.{suffix}``). Defaults to ``name``.
         """
         self.name = name
         self.label = label or name.replace("_", " ").replace("_", " ").capitalize()
@@ -643,3 +650,4 @@ class HarlequinCopyFormat:
             ext if ext.startswith(".") else f".{ext}" for ext in self.extensions
         ]
         self.options = options or tuple()
+        self.filename_suffix = (filename_suffix or name).lstrip(".")

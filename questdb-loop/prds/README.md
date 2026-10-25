@@ -1,0 +1,42 @@
+# Performance Improvements & Bug Fixes — Atomic PRD Catalog (`PRD-01` .. `PRD-26`)
+
+Each PRD in this directory specifies **one atomic, self-contained software engineering slice** designed to be implemented, verified, and landed as a **separate commit / pull request**.
+
+## Execution & State Machine Integration
+
+- **Checklist Gate**: `questdb-loop/V1_SHIP_CHECKLIST.md` (`## Must — bug fixes (atomic PR slices)` and `## Must — performance improvements (atomic PR slices)`).
+- **State Machine Queue**: `questdb-loop/ralph/state/loop_state.json` (`prd_queue` and `current_slice`).
+- **One Slice = One Commit/PR**: During `SELECT`, the Ralph state machine picks the highest-priority unchecked PRD slice from `V1_SHIP_CHECKLIST.md` / `prd_queue`, packs only the files relevant to that PRD (`context_pack.py`), runs `GRILL` → `BUILD` → `VERIFY` → `PROGRESS`, and checks off that single PRD item upon verification.
+
+---
+
+## Master PRD Table (Ordered by Priority & Execution Sequence)
+
+| PRD ID | Category | Severity | Title & Spec File | Primary Files | Suggested Commit / PR Title |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`PRD-01`** | `Bug` | `P0` | [PRD-01-questdb-source-sync.md](./PRD-01-questdb-source-sync.md) | `src/harlequin_questdb/*`, `questdb-loop/scripts/sync-harlequin-questdb-package.sh` | `fix(questdb): sync in-tree questdb adapter with hardened staged package` |
+| **`PRD-17`** | `Bug` | `P0` | [PRD-17-export-screen-custom-filename-preservation.md](./PRD-17-export-screen-custom-filename-preservation.md) | `src/harlequin/components/export_screen.py`, `src/harlequin/export.py` | `fix(export-screen): preserve custom filenames when auto-switching format from extension` |
+| **`PRD-09`** | `Bug` | `P0` | [PRD-09-debug-info-focus-crash-fix.md](./PRD-09-debug-info-focus-crash-fix.md) | `src/harlequin/components/debug_info.py` | `fix(debug-info): fix collapsible selector IDs in move_focus and scroll container in on_key` |
+| **`PRD-11`** | `Bug` | `P0` | [PRD-11-sqlite-identifier-escaping-and-null-type-fix.md](./PRD-11-sqlite-identifier-escaping-and-null-type-fix.md) | `src/harlequin_sqlite/adapter.py`, `catalog.py`, `interactions.py` | `fix(sqlite): fix column type mapping, pragma table_info syntax, and identifier escaping` |
+| **`PRD-23`** | `Bug` | `P0` | [PRD-23-sqlite-cursor-limit-one-and-empty-fetchone-bug.md](./PRD-23-sqlite-cursor-limit-one-and-empty-fetchone-bug.md) | `src/harlequin_sqlite/adapter.py` | `fix(sqlite): handle set_limit(1) in fetchall and return None from fetchone when empty` |
+| **`PRD-25`** | `Bug` | `P0` | [PRD-25-questdb-conn-str-precedence-and-pool-lifecycle.md](./PRD-25-questdb-conn-str-precedence-and-pool-lifecycle.md) | `src/harlequin_questdb/adapter.py` | `fix(questdb): preserve conn_str parameters over defaults and close pool on connect failure` |
+| **`PRD-02`** | `Bug` | `P1` | [PRD-02-member-completer-case-sensitivity-bug.md](./PRD-02-member-completer-case-sensitivity-bug.md) | `src/harlequin/autocomplete/completion.py`, `completers.py` | `fix(autocomplete): normalize completion context to lowercase for member autocomplete` |
+| **`PRD-03`** | `Performance` | `P1` | [PRD-03-autocomplete-indexing-and-fuzzy-perf.md](./PRD-03-autocomplete-indexing-and-fuzzy-perf.md) | `src/harlequin/autocomplete/completers.py`, `completion.py` | `perf(autocomplete): index member contexts, deduplicate catalog items, and optimize matching` |
+| **`PRD-04`** | `Performance` | `P1` | [PRD-04-export-background-worker-ui-responsiveness.md](./PRD-04-export-background-worker-ui-responsiveness.md) | `src/harlequin/app.py`, `src/harlequin/components/export_screen.py` | `perf(export): run file export in background thread worker` |
+| **`PRD-05`** | `Performance` | `P1` | [PRD-05-export-streaming-and-batch-perf.md](./PRD-05-export-streaming-and-batch-perf.md) | `src/harlequin/export.py` | `perf(export): stream html output and use tuple row iteration for tabular writers` |
+| **`PRD-06`** | `Bug` | `P1` | [PRD-06-export-duckdb-resource-safety-and-options.md](./PRD-06-export-duckdb-resource-safety-and-options.md) | `src/harlequin/export.py` | `fix(export): preserve falsy options, handle excel timezones, and close duckdb/openpyxl resources` |
+| **`PRD-07`** | `Bug` | `P1` | [PRD-07-select-option-flat-choices-bug.md](./PRD-07-select-option-flat-choices-bug.md) | `src/harlequin/options.py` | `fix(options): return option value instead of label in SelectOption._flat_choices` |
+| **`PRD-08`** | `Bug` | `P1` | [PRD-08-keymap-mutation-and-action-validation.md](./PRD-08-keymap-mutation-and-action-validation.md) | `src/harlequin/keymap.py` | `fix(keymap): avoid mutating HarlequinKeyBinding.__dict__ and validate action names` |
+| **`PRD-10`** | `Bug` | `P1` | [PRD-10-s3-tree-stdout-and-regional-url-fix.md](./PRD-10-s3-tree-stdout-and-regional-url-fix.md) | `src/harlequin/components/data_catalog/s3_tree.py` | `fix(catalog): fix S3Tree stdout print, regional S3 URL parsing, and root data initialization` |
+| **`PRD-12`** | `Bug` | `P1` | [PRD-12-duckdb-identifier-escaping-in-catalog-and-ddl.md](./PRD-12-duckdb-identifier-escaping-in-catalog-and-ddl.md) | `src/harlequin_duckdb/adapter.py`, `catalog.py`, `interactions.py` | `fix(duckdb): escape quotes in catalog identifiers, show_relation_ddl, and .open script rewriting` |
+| **`PRD-24`** | `Bug` | `P1` | [PRD-24-duckdb-validate-sql-motherduck-url-and-close.md](./PRD-24-duckdb-validate-sql-motherduck-url-and-close.md) | `src/harlequin_duckdb/adapter.py` | `fix(duckdb): catch duckdb.Error in validate_sql/connect, fix MotherDuck URL params, and implement close()` |
+| **`PRD-13`** | `Performance` | `P1` | [PRD-13-questdb-pool-check-and-catalog-perf.md](./PRD-13-questdb-pool-check-and-catalog-perf.md) | `src/harlequin_questdb/adapter.py` | `perf(questdb): avoid redundant pool check round-trips and autocommit resets` |
+| **`PRD-14`** | `Performance` | `P1` | [PRD-14-editor-selection-validation-caching.md](./PRD-14-editor-selection-validation-caching.md) | `src/harlequin/app.py` | `perf(editor): memoize _validate_selection to avoid synchronous DB calls on cursor events` |
+| **`PRD-15`** | `Bug` | `P1` | [PRD-15-atomic-cache-writes-and-eof-resilience.md](./PRD-15-atomic-cache-writes-and-eof-resilience.md) | `src/harlequin/editor_cache.py`, `catalog_cache.py`, `app.py`, `code_editor.py` | `fix(cache): atomic cache writes, handle truncated pickles, and guard empty editor buffers` |
+| **`PRD-18`** | `Bug` | `P1` | [PRD-18-code-editor-selected-queries-semicolon-boundary.md](./PRD-18-code-editor-selected-queries-semicolon-boundary.md) | `src/harlequin/components/code_editor.py` | `fix(editor): stop selected_queries at semicolon boundary when selection ends at separator` |
+| **`PRD-19`** | `Bug` | `P1` | [PRD-19-app-thread-safety-and-cursor-table-id.md](./PRD-19-app-thread-safety-and-cursor-table-id.md) | `src/harlequin/app.py` | `fix(app): use call_from_thread in commit/rollback and sequential table IDs in _execute_query` |
+| **`PRD-20`** | `Bug` | `P1` | [PRD-20-config-missing-profiles-and-windows-tz-leak.md](./PRD-20-config-missing-profiles-and-windows-tz-leak.md) | `src/harlequin/config.py`, `src/harlequin/windows_timezone.py` | `fix(config): guard missing profiles key in schema check and close tarfile/urlopen in windows_timezone` |
+| **`PRD-26`** | `Bug` | `P1` | [PRD-26-ralph-state-machine-verify-and-router-hardening.md](./PRD-26-ralph-state-machine-verify-and-router-hardening.md) | `questdb-loop/ralph/{loop,router,contracts,state,checklist,context_pack}.py` | `fix(ralph): harden phase_verify verdict gate, issue board escalation, and atomic state persistence` |
+| **`PRD-16`** | `Bug` | `P2` | [PRD-16-option-name-regex-and-core-hygiene.md](./PRD-16-option-name-regex-and-core-hygiene.md) | `src/harlequin/options.py`, `colors.py`, `components/help_screen.py` | `fix(core): anchor option name regex, copy BUILTIN_THEMES, and specify utf-8 in HelpScreen` |
+| **`PRD-21`** | `Bug` | `P2` | [PRD-21-database-tree-sorting-and-file-tree-dedup.md](./PRD-21-database-tree-sorting-and-file-tree-dedup.md) | `src/harlequin/components/data_catalog/database_tree.py`, `__init__.py` | `fix(catalog): sort preloaded children, preserve dot-identifier highlight, and deduplicate FileTree` |
+| **`PRD-22`** | `Performance` | `P2` | [PRD-22-history-option-renderable-caching.md](./PRD-22-history-option-renderable-caching.md) | `src/harlequin/components/history_screen.py` | `perf(history): precompute HistoryOption prompt renderable on init` |

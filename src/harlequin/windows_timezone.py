@@ -39,21 +39,22 @@ def check_and_install_tzdata() -> None:
             pretty_print_warning(title="Harlequin Timezone Support", message=message)
             try:
                 # tz database is missing. We need to install it.
-                response = urlopen(
+                with urlopen(
                     "https://www.iana.org/time-zones/repository/tzdata-latest.tar.gz"
-                )
-                with TemporaryDirectory() as tmpdir:
-                    tar_path = Path(tmpdir) / "tzdata.tar.gz"
-                    with tar_path.open("wb") as f:
-                        f.write(response.read())
-                    tarfile.open(tar_path).extractall(HARLEQUIN_TZ_DATA_PATH)
-                zone_response = urlopen(
+                ) as response:
+                    with TemporaryDirectory() as tmpdir:
+                        tar_path = Path(tmpdir) / "tzdata.tar.gz"
+                        with tar_path.open("wb") as f:
+                            f.write(response.read())
+                        with tarfile.open(tar_path) as tar:
+                            tar.extractall(HARLEQUIN_TZ_DATA_PATH)
+                with urlopen(
                     "https://raw.githubusercontent.com/unicode-org/cldr/main/common/"
                     "supplemental/windowsZones.xml"
-                )
-                zone_target = HARLEQUIN_TZ_DATA_PATH / "windowsZones.xml"
-                with zone_target.open("wb") as f:
-                    f.write(zone_response.read())
+                ) as zone_response:
+                    zone_target = HARLEQUIN_TZ_DATA_PATH / "windowsZones.xml"
+                    with zone_target.open("wb") as f:
+                        f.write(zone_response.read())
                 pa.set_timezone_db_path(str(HARLEQUIN_TZ_DATA_PATH))
             except Exception as e:
                 err_msg = (

@@ -33,11 +33,8 @@ def _validate_float(raw: str) -> tuple[bool, str | None]:
         return True, None
 
 
-csv = HarlequinCopyFormat(
-    name="csv",
-    label="CSV",
-    extensions=(".csv", ".tsv"),
-    options=[
+def _csv_like_options(sep_default: str) -> list:
+    return [
         FlagOption(
             name="header",
             description="Switch on to include column name headers.",
@@ -48,7 +45,7 @@ csv = HarlequinCopyFormat(
             name="sep",
             description="The separator (or delimeter) between cols in each row.",
             label="Separator",
-            default=",",
+            default=sep_default,
         ),
         SelectOption(
             name="compression",
@@ -111,7 +108,22 @@ csv = HarlequinCopyFormat(
             label="Encoding",
             default="UTF8",
         ),
-    ],
+    ]
+
+
+csv = HarlequinCopyFormat(
+    name="csv",
+    label="CSV",
+    extensions=(".csv",),
+    options=_csv_like_options(","),
+)
+
+tsv = HarlequinCopyFormat(
+    name="tsv",
+    label="TSV",
+    extensions=(".tsv",),
+    filename_suffix="tsv",
+    options=_csv_like_options("\t"),
 )
 
 
@@ -138,18 +150,8 @@ parquet = HarlequinCopyFormat(
 )
 
 
-json = HarlequinCopyFormat(
-    name="json",
-    label="JSON",
-    extensions=(".json", ".js", ".ndjson"),
-    options=[
-        FlagOption(
-            name="array",
-            description=(
-                "Whether to write a JSON array. If true, a JSON array of records is "
-                "written, if false, newline-delimited JSON is written."
-            ),
-        ),
+def _json_compression_options() -> list:
+    return [
         SelectOption(
             name="compression",
             description=(
@@ -157,13 +159,13 @@ json = HarlequinCopyFormat(
                 "automatically from the file extension (e.g. file.json.gz will use "
                 "gzip, file.json will use no compression)."
             ),
+            default="auto",
             choices=[
                 ("Auto", "auto"),
                 ("gzip", "gzip"),
                 ("zstd", "zstd"),
                 ("Uncompressed", "uncompressed"),
             ],
-            default="auto",
         ),
         TextOption(
             name="date_format",
@@ -179,7 +181,102 @@ json = HarlequinCopyFormat(
             default="",
             placeholder="%c",
         ),
+    ]
+
+
+json = HarlequinCopyFormat(
+    name="json",
+    label="JSON",
+    extensions=(".json", ".js"),
+    options=[
+        FlagOption(
+            name="array",
+            description=(
+                "Whether to write a JSON array. If true, a JSON array of records is "
+                "written, if false, newline-delimited JSON is written."
+            ),
+        ),
+        *_json_compression_options(),
     ],
+)
+
+jsonl = HarlequinCopyFormat(
+    name="jsonl",
+    label="JSON Lines",
+    extensions=(".jsonl", ".ndjson"),
+    filename_suffix="jsonl",
+    options=_json_compression_options(),
+)
+
+markdown = HarlequinCopyFormat(
+    name="markdown",
+    label="Markdown",
+    extensions=(".md", ".markdown"),
+    filename_suffix="md",
+    options=[],
+)
+
+html = HarlequinCopyFormat(
+    name="html",
+    label="HTML",
+    extensions=(".html", ".htm"),
+    filename_suffix="html",
+    options=[],
+)
+
+excel = HarlequinCopyFormat(
+    name="excel",
+    label="Excel",
+    extensions=(".xlsx",),
+    filename_suffix="xlsx",
+    options=[
+        TextOption(
+            name="sheet_name",
+            description="Name of the worksheet to create.",
+            label="Sheet Name",
+            default="Results",
+        ),
+    ],
+)
+
+iceberg = HarlequinCopyFormat(
+    name="iceberg",
+    label="Iceberg (Parquet payload)",
+    extensions=(".iceberg",),
+    filename_suffix="iceberg",
+    options=[
+        SelectOption(
+            name="compression",
+            description=(
+                "Parquet compression for the on-disk snapshot. This writes a single "
+                "Parquet-compatible file using the .iceberg extension (not a full "
+                "Iceberg catalog table)."
+            ),
+            choices=[
+                ("Snappy", "snappy"),
+                ("gzip", "gzip"),
+                ("zstd", "zstd"),
+                ("Uncompressed", "uncompressed"),
+            ],
+            default="snappy",
+        )
+    ],
+)
+
+arrow_ipc = HarlequinCopyFormat(
+    name="arrow",
+    label="Apache Arrow IPC",
+    extensions=(".arrow", ".ipc"),
+    filename_suffix="arrow",
+    options=[],
+)
+
+duckdb_file = HarlequinCopyFormat(
+    name="duckdb",
+    label="DuckDB",
+    extensions=(".duckdb",),
+    filename_suffix="duckdb",
+    options=[],
 )
 
 orc = HarlequinCopyFormat(
@@ -339,5 +436,33 @@ feather = HarlequinCopyFormat(
     ],
 )
 
-HARLEQUIN_COPY_FORMATS = [csv, parquet, json, orc, feather]
-WINDOWS_COPY_FORMATS = [csv, parquet, json, feather]
+HARLEQUIN_COPY_FORMATS = [
+    csv,
+    tsv,
+    parquet,
+    json,
+    jsonl,
+    markdown,
+    html,
+    excel,
+    iceberg,
+    arrow_ipc,
+    duckdb_file,
+    orc,
+    feather,
+]
+
+WINDOWS_COPY_FORMATS = [
+    csv,
+    tsv,
+    parquet,
+    json,
+    jsonl,
+    markdown,
+    html,
+    excel,
+    iceberg,
+    arrow_ipc,
+    duckdb_file,
+    feather,
+]

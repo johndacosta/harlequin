@@ -30,8 +30,8 @@ HARLEQUIN_TEXTUAL_THEME = TextualTheme(
     dark=True,
 )
 
-VALID_THEMES = BUILTIN_THEMES
-VALID_THEMES.pop("textual-ansi")
+VALID_THEMES = dict(BUILTIN_THEMES)
+VALID_THEMES.pop("textual-ansi", None)
 VALID_THEMES.update({"harlequin": HARLEQUIN_TEXTUAL_THEME})
 
 HARLEQUIN_QUESTIONARY_STYLE = (
