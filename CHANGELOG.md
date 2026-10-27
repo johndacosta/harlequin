@@ -4,11 +4,31 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Features
+
+- Enter on a text file in the Files tree opens it in the query editor. The tab is named for that file, unsaved edits are marked, save writes the same path, and closing a dirty file asks before discarding it.
+- Opening a file into a query tab that already has a path binds the opened file, so saving writes that file.
+- The Files tab can show several directories at once. Show Files adds a directory and leaves the ones already shown. Close Folder removes the selected directory and leaves query tabs alone.
+- Save on a query tab that is not a file asks for a folder in that tree and a file name. The tab becomes that file, its full path is shown, and the next save writes it. Quit restores the binding from a new buffer-cache version. A version-1 cache still loads as text with no path.
+- That save can browse to a folder that is not already shown. The browser lists one directory level at a time, and Up lists the parent.
+- Open Folder browses to a directory and adds it to the Files tab. Open File browses to a text file and opens one query tab. Show Files still types a path.
+- Open Folder and Open File use the same name and path lines as save. New File, New Folder, Rename, and Delete work there and on the Files tab. Delete asks with the full path. Rename keeps an open query on the new path. Delete keeps the query text and clears the path. The list is still one directory at a time.
+- Typing in the Files tree, or in the save, Open Folder, and Open File browsers, narrows that one directory to names that contain the text. A folder name matches as typed, and clearing the search or moving to another directory shows that directory's own names.
+- A query tab has a close control. Closing unsaved text, including a query that is not a file, asks to save, close without saving, or cancel. A file that still matches its last load or save closes without asking. Save writes the editor bytes and then closes the tab.
+- Keymaps are plugins, and the author's VS Code keymap is unchanged and still the default. The command palette can load VS Code, VS Code and Files, Vim, or Emacs. Loading a keymap again replaces its bindings. A profile's `keymap_name` is the list that profile starts with, which is how a default set of plugins is chosen.
+- The Files keymap adds shortcuts for files, buffers, focus, transactions, cancel, and the theme. Load it after VS Code: `--keymap-name vscode --keymap-name files`.
+- Vim and Emacs are full keymaps. Vim starts in insert mode; Escape enters normal mode, and Space then a letter reaches the rest of the app. Emacs uses emacs cursor keys in the editor and a `ctrl+x` prefix for save, quit, open, and buffers.
+- Harlequin can keep eight database connections open. Open Connection, Switch Connection, and Close Connection are in the command palette. The last connection stays open until quit, and quit closes each open connection once. Save Connection writes a profile, including the keymaps in use.
+
 ### Bug Fixes
 
 - For SQLite, the Data Catalog's **Describe** action now inserts a query that runs, and **Show DDL** shows the right DDL for tables and views in an attached database.
 - For DuckDB, a bare `.open` in an init script no longer fails when the main database is in-memory ([#1207](https://github.com/tconbeer/harlequin/issues/1207)).
 - For DuckDB, more column types (such as `ENUM`, `JSON` and `UNION`) now have a type label instead of `?`, and `ARRAY` columns are labeled as lists ([#1207](https://github.com/tconbeer/harlequin/issues/1207)).
+- Member autocomplete now works when a table or schema name is uppercase or mixed case and the prefix is typed in a different case ([#1200](https://github.com/tconbeer/harlequin/issues/1200)).
+- The debug info screen no longer crashes when moving focus between its sections, and Page Up and Page Down now scroll it ([#1201](https://github.com/tconbeer/harlequin/issues/1201)).
+- The overwrite confirm shows the file path as literal text, so a path containing brackets does not crash the dialog or hide part of the name.
+- Choosing a path in the save, Open Folder, or Open File browser does not insert that path into the query.
 
 ## [2.17.0] - 2026-10-26
 
