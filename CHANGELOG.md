@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Error panels no longer drop bracketed text, such as SQL identifiers, from driver messages ([#1137](https://github.com/tconbeer/harlequin/issues/1137)).
 - Fixes member autocomplete context matching so uppercase and mixed-case table prefixes resolve members case-insensitively.
 - Fixes collapsible widget IDs in `DebugInfoScreen.move_focus` and corrects scroll container targeting for pageup/pagedown keys.
+- Ensures `HarlequinKeyBinding.to_dict` does not mutate instance state, corrects `key_display` error message in keymaps, copies builtin themes safely, and enforces option name matching with `fullmatch`.
 
 ## [2.16.2] - 2026-10-18
 
