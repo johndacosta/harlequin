@@ -4,12 +4,6 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [2.17.0] - 2026-10-26
-### Bug Fixes
-
-- The overwrite confirm shows the file path as literal text, so a path containing brackets does not crash the dialog or hide part of the name.
-- Choosing a path in the save, Open Folder, or Open File browser does not insert that path into the query.
-
 ### Features
 
 - Enter on a text file in the Files tree opens it in the query editor. The tab is named for that file, unsaved edits are marked, save writes the same path, and closing a dirty file asks before discarding it.
@@ -22,7 +16,6 @@ All notable changes to this project will be documented in this file.
 - Typing in the Files tree, or in the save, Open Folder, and Open File browsers, narrows that one directory to names that contain the text. A folder name matches as typed, and clearing the search or moving to another directory shows that directory's own names.
 - A query tab has a close control. Closing unsaved text, including a query that is not a file, asks to save, close without saving, or cancel. A file that still matches its last load or save closes without asking. Save writes the editor bytes and then closes the tab.
 - Fuzzy find, project-wide search, move, drag-and-drop, git decorations, preview-without-open, reloading a file changed on disk, and editing S3 objects stay deferred.
-- Press `ctrl+g` in the Results Viewer to jump to a column by name, with fuzzy matching, while keeping the current row. The command palette also offers **Jump to Column**.
 - Keymaps are plugins, and the author's VS Code keymap is unchanged and still the default. The command palette can load VS Code, VS Code and Files, Vim, or Emacs. Loading a keymap again replaces its bindings. A profile's `keymap_name` is the list that profile starts with, which is how a default set of plugins is chosen.
 - The Files keymap adds shortcuts for files, buffers, focus, transactions, cancel, and the theme. Load it after VS Code: `--keymap-name vscode --keymap-name files`.
 - Vim and Emacs are full keymaps. Vim starts in insert mode; Escape enters normal mode, and Space then a letter reaches the rest of the app. Emacs uses emacs cursor keys in the editor and a `ctrl+x` prefix for save, quit, open, and buffers.
@@ -30,13 +23,24 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- Running selected text or showing a table's DDL no longer crashes with duckdb 2.0 installed ([#1204](https://github.com/tconbeer/harlequin/issues/1204)).
-- With duckdb 2.0, statements like `create table` and `set` no longer open an empty result tab or make `hsql` print a `Count` or `Success` table, and running a query while another is still running replaces it instead of raising an error.
-- Exporting to ORC no longer fails on a column that holds only `NULL`.
+- The overwrite confirm shows the file path as literal text, so a path containing brackets does not crash the dialog or hide part of the name.
+- Choosing a path in the save, Open Folder, or Open File browser does not insert that path into the query.
 - Error panels no longer drop bracketed text, such as SQL identifiers, from driver messages ([#1137](https://github.com/tconbeer/harlequin/issues/1137)).
 - Fixes member autocomplete context matching so uppercase and mixed-case table prefixes resolve members case-insensitively.
 - Fixes collapsible widget IDs in `DebugInfoScreen.move_focus` and corrects scroll container targeting for pageup/pagedown keys.
 - Ensures `HarlequinKeyBinding.to_dict` does not mutate instance state, corrects `key_display` error message in keymaps, copies builtin themes safely, and enforces option name matching with `fullmatch`.
+
+## [2.17.0] - 2026-10-26
+
+### Features
+
+- Press `ctrl+g` in the Results Viewer to jump to a column by name, with fuzzy matching, while keeping the current row. The command palette also offers **Jump to Column**.
+
+### Bug Fixes
+
+- Running selected text or showing a table's DDL no longer crashes with duckdb 2.0 installed ([#1204](https://github.com/tconbeer/harlequin/issues/1204)).
+- With duckdb 2.0, statements like `create table` and `set` no longer open an empty result tab or make `hsql` print a `Count` or `Success` table, and running a query while another is still running replaces it instead of raising an error.
+- Exporting to ORC no longer fails on a column that holds only `NULL`.
 
 ## [2.16.2] - 2026-10-18
 
