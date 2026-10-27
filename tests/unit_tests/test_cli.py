@@ -198,6 +198,7 @@ def test_default(
         adapter=mock_adapter.return_value,
         profile_name=None,
         adapter_name="duckdb",
+        conn_str=expected_conn_str,
         connection_hash=mock_adapter.return_value.connection_id,
         record_history=True,
         viewer_max_rows=DEFAULT_VIEWER_MAX_ROWS,

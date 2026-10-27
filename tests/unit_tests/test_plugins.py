@@ -89,7 +89,7 @@ def test_load_adapter_raises_when_the_adapter_will_not_import(
 
 def test_load_keymap_plugins() -> None:
     built_in_keymaps = load_keymap_plugins(user_defined_keymaps=[])
-    assert len(built_in_keymaps) == 1
+    assert set(built_in_keymaps) == {"vscode", "files", "vim", "emacs"}
     assert DEFAULT_KEYMAP_NAMES[0] in built_in_keymaps
     assert isinstance(built_in_keymaps[DEFAULT_KEYMAP_NAMES[0]], HarlequinKeyMap)
     assert built_in_keymaps[DEFAULT_KEYMAP_NAMES[0]].bindings
