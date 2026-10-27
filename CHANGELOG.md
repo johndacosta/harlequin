@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - With duckdb 2.0, statements like `create table` and `set` no longer open an empty result tab or make `hsql` print a `Count` or `Success` table, and running a query while another is still running replaces it instead of raising an error.
 - Exporting to ORC no longer fails on a column that holds only `NULL`.
 - Error panels no longer drop bracketed text, such as SQL identifiers, from driver messages ([#1137](https://github.com/tconbeer/harlequin/issues/1137)).
+- Fixes member autocomplete context matching so uppercase and mixed-case table prefixes resolve members case-insensitively.
 
 ## [2.16.2] - 2026-10-18
 
