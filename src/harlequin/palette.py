@@ -40,6 +40,11 @@ def _can_rollback(app: Harlequin) -> bool:
     )
 
 
+def _files_are_shown(app: Harlequin) -> bool:
+    catalog = getattr(app, "data_catalog", None)
+    return catalog is not None and getattr(catalog, "file_tree", None) is not None
+
+
 def _has_many_buffers(app: Harlequin) -> bool:
     return app.editor_collection.tab_count > 1
 
@@ -130,6 +135,12 @@ PALETTE_COMMANDS: tuple[PaletteCommand, ...] = (
         is_available=_has_many_buffers,
     ),
     PaletteCommand(
+        "Previous Buffer",
+        "Switch to the previous buffer",
+        "code_editor.previous_buffer",
+        is_available=_has_many_buffers,
+    ),
+    PaletteCommand(
         "Save Query", "Save the current buffer to a file", "code_editor.save_buffer"
     ),
     PaletteCommand(
@@ -171,13 +182,95 @@ PALETTE_COMMANDS: tuple[PaletteCommand, ...] = (
     ),
     PaletteCommand(
         "Show Files",
-        "Show a directory in the Data Catalog's Files tab",
+        "Add a directory to the Data Catalog's Files tab",
         "show_files",
+    ),
+    PaletteCommand(
+        "Open Folder",
+        "Browse to a directory and add it to the Files tab",
+        "open_folder",
+    ),
+    PaletteCommand(
+        "Open File",
+        "Browse to a text file and open it in a query tab",
+        "open_file",
+    ),
+    PaletteCommand(
+        "Close Folder",
+        "Remove the selected directory from the Files tab",
+        "close_folder",
+        is_available=_files_are_shown,
+    ),
+    PaletteCommand(
+        "New File",
+        "Create an empty file in the Files folder under the cursor",
+        "new_file",
+        is_available=_files_are_shown,
+    ),
+    PaletteCommand(
+        "New Folder",
+        "Create an empty folder in the Files folder under the cursor",
+        "new_folder",
+        is_available=_files_are_shown,
+    ),
+    PaletteCommand(
+        "Rename File or Folder",
+        "Rename the file or folder under the Files cursor",
+        "rename_path",
+        is_available=_files_are_shown,
+    ),
+    PaletteCommand(
+        "Delete File or Folder",
+        "Delete the file or folder under the Files cursor",
+        "delete_path",
+        is_available=_files_are_shown,
     ),
     PaletteCommand(
         "Show S3",
         "Show an S3 bucket in the Data Catalog's S3 tab",
         "show_s3",
         is_available=lambda app: boto3_is_installed(),
+    ),
+    # keymaps. None of these bind a key: ctrl+p already opens the palette.
+    PaletteCommand(
+        "Keymap: VS Code",
+        "Use the author's VS Code shortcuts",
+        "use_vscode_keymap",
+    ),
+    PaletteCommand(
+        "Keymap: VS Code and Files",
+        "Keep the VS Code shortcuts and add keys for files, focus, and transactions",
+        "use_files_keymap",
+    ),
+    PaletteCommand(
+        "Keymap: Vim",
+        "Edit queries with vim keys. Escape leaves insert mode",
+        "use_vim_keymap",
+    ),
+    PaletteCommand(
+        "Keymap: Emacs",
+        "Edit queries with emacs keys, including a ctrl+x prefix",
+        "use_emacs_keymap",
+    ),
+    # connections
+    PaletteCommand(
+        "Open Connection",
+        "Connect to another database and keep this one open",
+        "open_connection",
+    ),
+    PaletteCommand(
+        "Switch Connection",
+        "Run queries on another open connection",
+        "switch_connection",
+    ),
+    PaletteCommand(
+        "Close Connection",
+        "Close an open connection. The last one stays until you quit",
+        "close_connection",
+    ),
+    PaletteCommand(
+        "Save Connection",
+        "Save this connection as a profile, including the keymaps in use",
+        "save_connection",
     ),
 )
