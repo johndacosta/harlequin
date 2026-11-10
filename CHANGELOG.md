@@ -25,6 +25,9 @@ All notable changes to this project will be documented in this file.
 - For SQLite, the Data Catalog's **Describe** action now inserts a query that runs, and **Show DDL** shows the right DDL for tables and views in an attached database.
 - For DuckDB, a bare `.open` in an init script no longer fails when the main database is in-memory ([#1207](https://github.com/tconbeer/harlequin/issues/1207)).
 - For DuckDB, more column types (such as `ENUM`, `JSON` and `UNION`) now have a type label instead of `?`, and `ARRAY` columns are labeled as lists ([#1207](https://github.com/tconbeer/harlequin/issues/1207)).
+- For DuckDB, nanosecond values like `TIMESTAMP_NS` no longer crash the Results Viewer; they show to the microsecond, and infinite timestamps show as ∞ ([#1207](https://github.com/tconbeer/harlequin/issues/1207)).
+- For DuckDB, `BIGNUM` (formerly `VARINT`) values now show as integers instead of raw bytes in the Results Viewer ([#1214](https://github.com/tconbeer/harlequin/issues/1214)).
+- With duckdb 2.0, `VARIANT` values now show as the values they hold instead of raw bytes in the Results Viewer.
 - Member autocomplete now works when a table or schema name is uppercase or mixed case and the prefix is typed in a different case ([#1200](https://github.com/tconbeer/harlequin/issues/1200)).
 - The debug info screen no longer crashes when moving focus between its sections, and Page Up and Page Down now scroll it ([#1201](https://github.com/tconbeer/harlequin/issues/1201)).
 - The overwrite confirm shows the file path as literal text, so a path containing brackets does not crash the dialog or hide part of the name.
